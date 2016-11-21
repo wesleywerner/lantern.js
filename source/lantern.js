@@ -139,9 +139,9 @@ lantern = (function(){
   /*
    * Find a world item by name. Not limited to any scope.
    */
-  function _findByName (name, parentChildred) {
+  function _findByName (name, parentChildren) {
     var match = null;
-    var list = parentChildred || this.data.world;
+    var list = parentChildren || this.data.world;
     for (var i=0; i<list.length; i++) {
       if (match != null) break;
       var item = list[i];
