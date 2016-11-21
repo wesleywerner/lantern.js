@@ -14,12 +14,12 @@
           "children": []
         },
         {
-          "type": "thing",
+          "type": "supporter",
           "name": "desk",
           "description": "A coding desk.",
           "children": [
             {
-              "type": "thing",
+              "type": "object",
               "name": "laptop",
               "description": "A red laptop displaying lines and lines of code.",
               "children": []
