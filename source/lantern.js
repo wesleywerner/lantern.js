@@ -21,9 +21,9 @@ var lantern = lantern || {};
 
 lantern = (function(){
 	
-	/**
-		A basic parser that understands verbs, directions and nouns, and translates these into an action object.
-		*/
+	/*
+   * A basic parser that understands verbs, directions and nouns, and translates these into an action object.
+   */
 	function parse (sentence, known_nouns) {
 		
 		if (sentence == null) return;
@@ -89,20 +89,20 @@ lantern = (function(){
 	}
 	
 	
-	/**
-		looks at a parsed action and decides which objects to act upon.
-		It should be aware of the things visible in the current room.
-		It will also handle special cases where the verb acts upon the player, or the current room.
-		*/
-	function interpret (sentence, known_nouns) {
+	/*
+   * looks at a parsed action and decides which objects to act upon.
+   * It should be aware of the things visible in the current room.
+   * It will also handle special cases where the verb acts upon the player, or the current room.
+   */
+	function _interpret (sentence, known_nouns) {
 		var translation = parse(sentence, known_nouns);
 		return translation;
 	}
 	
-	
-	/**
-		Define various options that lantern looks at during world simulation.
-		*/
+  
+	/*
+   * Define various options that lantern looks at during world simulation.
+   */
 	var _options = {
 		ignores: ['an', 'a', 'the', 'for', 'to', 'at', 'of', 'with', 'about', 'on'],
 		synonymns: [
@@ -113,13 +113,55 @@ lantern = (function(){
       ['examine', 'x'],
 		],
 	};
+  
+  
+  /*
+   * Loads the world model from a JSON string.
+   */
+  function _loadWorld (definition) {
+    try {
+      var model = JSON.parse(definition);
+      this.data = model;
+      
+      // find the player object as defined in the data
+      if (typeof this.data.player == 'string') {
+        this.data.player = this.findByName(this.data.player);
+      }
+
+    }
+    catch (e) {
+      console.warn('Could not load the world definition:');
+      console.warn(e);
+    }
+  }
+    
+  
+  /*
+   * Find a world item by name. Not limited to any scope.
+   */
+  function _findByName (name, parentChildred) {
+    var match = null;
+    var list = parentChildred || this.data.world;
+    for (var i=0; i<list.length; i++) {
+      if (match != null) break;
+      var item = list[i];
+      if (item.name == name)
+        match = item;
+      else
+        match = _findByName(name, item.children);
+    }
+    return match;
+  }
+  
 	
-	
-	/**
-		Return the lantern object.
-		*/
+	/*
+   * Return the lantern object.
+   */
 	return {
 		options: _options,
-		turn: interpret
+		turn: _interpret,
+    loadWorld: _loadWorld,
+    data: null,
+    findByName: _findByName,
 	}
 })();
