@@ -38,16 +38,18 @@
 
 	#content {
 		float:left;
-		width:40%;
+		width:39%;
+    padding-right: 1%;
 	}
 
 	#sidebar {
 		float:left;
-		width:59%;
+		width:58%;
 		font-family: monospace;
 		background-color: #eee;
 		padding-left: 1%;
 		padding-bottom: 1%;
+    border: 1px solid #ddd;
 	}
 
 	#footer {
@@ -61,7 +63,6 @@
 	
 	.test-detail {
 		color: blue;
-		font-style: italic;
 	}
 	.test-fail {
 		color: red;
@@ -84,7 +85,7 @@
 		<div id="content">
 			<form onsubmit="return submit_sentence()">
 			<input type="text" id="user_input">
-			<button type="submit">submit</button>
+			<button type="submit">parse</button>
 			<div id="parsed_result"></div>
 			</form>
 
@@ -140,8 +141,8 @@
 	</div>
 
     
-  <script src="lantern.js"></script>
-  <script src="tests.js"></script>
+  <script src="../source/lantern.js"></script>
+  <script src="parser-tests.js"></script>
   <script>
     function submit_sentence() {
       var inel = document.getElementById('user_input');

@@ -24,9 +24,9 @@ function run_test(sentence, known_nouns, expected) {
   o = lantern.turn(sentence, known_nouns);
 	loghead(JSON.stringify(o), 'test-detail');
   //console.log(o);
-  assert(o.verb, expected.verb, 'verb wrong');
-  assert(o.item, expected.item, 'item wrong');
-  assert(o.dir, expected.dir, 'item direction');
+  assert(o.verb, expected.verb, 'wrong verb, ');
+  assert(o.item, expected.item, 'wrong item, ');
+  assert(o.dir, expected.dir, 'wrong direction, -');
   if (expected.nouns == null && o.nouns != null) {
     logerr('expected no nouns, but I got some anyway.');
   }
@@ -78,7 +78,7 @@ run_test('eat the apple', [],
     item:'apple'
   });
   
-run_test('take an apple', [], 
+run_test('get an apple', [], 
   {
     verb:'take', 
     item:'apple'
@@ -158,7 +158,7 @@ run_test('put the box on the table', ['box', 'table'],
   
 run_test('pick up shovel', [], 
   {
-    verb:'pick', 
+    verb:'take', 
     item:'shovel',
     dir:'up'
   });
@@ -203,13 +203,29 @@ run_test('attack the demon', ['demon'],
     dir:null
   });
 
-run_test('cut tad with craft knife', ['craft knife'], 
+run_test('cut apple with craft knife', ['craft knife', 'red apple'], 
   {
     verb: 'attack', 
-    item: 'tad', 
+    item: 'red apple', 
     nouns:['craft knife'],
     dir:null
   });
+
+run_test('x red apple', ['craft knife', 'red apple'], 
+  {
+    verb: 'examine', 
+    item: 'red apple', 
+    nouns:null,
+    dir:null
+  });
+
+run_test('i', [], 
+{
+  verb: 'inventory', 
+  item: null, 
+  nouns:null,
+  dir:null
+});
 
 /*
  run_test('', [], 

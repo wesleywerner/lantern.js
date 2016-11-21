@@ -108,6 +108,9 @@ lantern = (function(){
 		synonymns: [
 			['attack', 'hit', 'smash', 'kick', 'cut', 'kill'],
 			['insert', 'put'],
+      ['take', 'get', 'pick'],
+      ['inventory', 'i'],
+      ['examine', 'x'],
 		],
 	};
 	
