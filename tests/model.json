@@ -1,0 +1,32 @@
+{
+  "version": 0.1,
+  "player": "wesley",
+  "world": [
+    {
+      "type": "room",
+      "name": "The Lab",
+      "description": "You are in a coding lab, there are bit and bytes flying through the air.",
+      "children": [
+        {
+          "type": "person",
+          "name": "wesley",
+          "description": "A coder sitting busy at the terminal.",
+          "children": []
+        },
+        {
+          "type": "thing",
+          "name": "desk",
+          "description": "A coding desk.",
+          "children": [
+            {
+              "type": "thing",
+              "name": "laptop",
+              "description": "A red laptop displaying lines and lines of code.",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
