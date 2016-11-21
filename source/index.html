@@ -1,0 +1,156 @@
+<!--
+   index.html
+   
+   Copyright 2016 wesley werner <wesley.werner@gmail.com>
+   
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see http://www.gnu.org/licenses/.
+   
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+	<title>lantern parser testbed</title>
+	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+	<meta name="generator" content="Geany 1.24.1" />
+	<style>
+	#container {
+		margin:20px auto;
+	}
+	
+	#header {
+		background-color: #000;
+		color: #fff;
+	}
+
+	#content {
+		float:left;
+		width:40%;
+	}
+
+	#sidebar {
+		float:left;
+		width:59%;
+		font-family: monospace;
+		background-color: #eee;
+		padding-left: 1%;
+		padding-bottom: 1%;
+	}
+
+	#footer {
+		clear:both;
+	}
+	
+	.test {
+		font-weight: bold;
+		margin-top: 4px;
+	}
+	
+	.test-detail {
+		color: blue;
+		font-style: italic;
+	}
+	.test-fail {
+		color: red;
+		}
+		
+	.test-win {
+		color: green;
+		}
+		
+	</style>
+</head>
+
+<body>
+
+	<div id="container">
+		<div id="header">
+			<h1>Testbed</h1>
+		</div>
+		
+		<div id="content">
+			<form onsubmit="return submit_sentence()">
+			<input type="text" id="user_input">
+			<button type="submit">submit</button>
+			<div id="parsed_result"></div>
+			</form>
+
+		  <p>
+		  <strong>The parser</strong> takes a sentence and gives a translation object back. It is told a list of known nouns in the current room and matches those with partially entered names. It should also know a list of verbs with synonymns, and replace any verbs with their common value (hit, kick, smash -> attack).
+		  </p>
+
+		  <p>
+		  <strong>The interpreter</strong> takes the translation and decides which object verb (function) should be called upon, with the nouns passed through. The verb should return true if it handled the action. If the verb returns false the interpreter will respond with a message from the list of default responses ("you see nothing special" etc). If the interpreter cannot find the target item, it responds "I don't see that", similarly if the item has no matching verb, it responds with "I did not understand what to do with the bronze key".
+		  </p>
+		  
+		  <p>
+		  When the target item is empty, the interpreter will direct the verb to either the player, or the current room, depending on the verb's intention.
+		  <ul>
+		  <li>GO, LISTEN, SMELL: the room</li>
+		  <li>Z: the world</li>
+		  </ul>
+		  </p>
+		  
+		  <p>
+		  <strong>The World</strong> objects should provided prototypes for easy checking and setting of properties:
+		  <pre>
+		  var door = new thing("metal door");
+		  door.is['openable'] = true;
+		  door.is['locked'] = true;
+		  door.on['bash'] = function() {
+			say("You bash the door open.");
+			this.is['open'] = true;
+			}
+		  </pre>
+		  </p>
+
+		  <p>
+			<strong>Drawing a flowchart</strong> of entered commands: http://flowchart.js.org
+			<pre>
+			CMD  TYPE  TITLE
+			000=>start: START
+			001=>operation: GO NORTH
+			002=>operation: OPEN BOX
+			003=>operation: TAKE BRONZE KEY
+			000->001->002->003
+			</pre>
+		  </p>
+		</div>
+		
+		<div id="sidebar">
+			<h3>Test Results</h3>
+		</div>
+		
+		<div id="footer">
+
+		</div>
+	</div>
+
+    
+  <script src="lantern.js"></script>
+  <script src="tests.js"></script>
+  <script>
+    function submit_sentence() {
+      var inel = document.getElementById('user_input');
+			var outel = document.getElementById('parsed_result');
+			outel.innerHTML = inel.value + ': ' + JSON.stringify(lantern.turn(inel.value));
+			inel.value = '';
+      return false;
+    }
+  </script>
+</body>
+
+</html>
