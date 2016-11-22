@@ -199,6 +199,48 @@ lantern = (function(){
     }
   }
   
+  
+  /*
+   * Get a list of all visible things in the player's location.
+   */
+  function _visibleThings () {
+    var location = _whichRoom.call(this, this.data.player);
+    return location.children;
+  }
+  
+  
+  /*
+   * Describe the given list of things.
+   */
+  function _describeList (list) {
+    var mentions = [];
+    var iterator = function (children) {
+      children.forEach(function (iteChild) {
+        mentions.push(iteChild.name);
+      });
+    }
+    list.forEach(function (listItem) {
+      mentions.push(listItem.name);
+      if (_childrenVisible.call(this, listItem)) {
+        iterator(listItem.children);
+      }
+    });
+    return mentions.join();
+  }
+  
+  
+  /*
+   * Determine if the children of an object should be listed.
+   */
+  function _childrenVisible (item) {
+    var obj = _toObject.call(this, item);
+    // don't list person inventory
+    if (obj.type == 'person') return false;
+    // don't list closed containers
+    if (obj.type == 'container' && obj.props.closed) return false;
+    return true;
+  }
+  
 	
 	/*
    * Return the lantern object.
@@ -209,6 +251,9 @@ lantern = (function(){
     loadWorld: _loadWorld,
     data: null,
     findByName: _findByName,
-    whichRoom: _whichRoom
+    whichRoom: _whichRoom,
+    
+    visibleThings: _visibleThings,
+    describeList: _describeList
 	}
 })();
