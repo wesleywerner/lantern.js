@@ -11,7 +11,14 @@
           "type": "person",
           "name": "wesley",
           "description": "A coder sitting busy at the terminal.",
-          "children": []
+          "children": [
+            {
+              "type": "object",
+              "name": "mug",
+              "description": "A carried coffee mug.",
+              "children": []
+            }
+          ]
         },
         {
           "type": "supporter",
@@ -22,6 +29,12 @@
               "type": "object",
               "name": "laptop",
               "description": "A red laptop displaying lines and lines of code.",
+              "children": []
+            },
+            {
+              "type": "object",
+              "name": "mug",
+              "description": "A coffee mug.",
               "children": []
             }
           ]
