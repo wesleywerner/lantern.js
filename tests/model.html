@@ -27,33 +27,79 @@
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 	<meta name="generator" content="Geany 1.24.1" />
   <style>
-    body {
-      background-color: #888;
-    }
-    .content {
-      width: 50%;
-      margin-left: auto;
-      margin-right: auto;
-      background-color: #ddd;
-      padding: 1%;
-    }
+	#container {
+		margin:20px auto;
+	}
+	#header {
+		background-color: #000;
+		color: #fff;
+	}
+	#content {
+		float:left;
+		width:39%;
+    padding-right: 1%;
+	}
+	#sidebar {
+		float:left;
+		width:58%;
+		font-family: monospace;
+		background-color: #eee;
+		padding-left: 1%;
+		padding-bottom: 1%;
+    border: 1px solid #ddd;
+	}
+	#footer {
+		clear:both;
+	}
+	.test {
+		font-weight: bold;
+		margin-top: 4px;
+	}
+	.test-detail {
+		color: blue;
+	}
+	.test-fail {
+		color: red;
+  }
+	.test-win {
+		color: green;
+  }
+  .test-result {
+    color: gray;
+    padding-right: 10px;
+  }
   </style>
 </head>
 
 <body>
 
-  <div class="content">
-    <p id="output">hello</p>
-  </div>
-  <div class="content">
-    <form onsubmit="return submit_sentence()">
-    <input type="text" id="user_input">
-    <button type="submit">parse</button>
-    <div id="parsed_result"></div>
-    </form>
-  </div>
+	<div id="container">
+		<div id="header">
+			<h1>Testbed</h1>
+		</div>
+		
+		<div id="content">
+			<form onsubmit="return submit_sentence()">
+			<input type="text" id="user_input">
+			<button type="submit">parse</button>
+			<div id="parsed_result"></div>
+			</form>
+  
+    <p>...</p>
+
+		</div>
+		
+		<div id="sidebar">
+			<h3>Test Results</h3>
+		</div>
+		
+		<div id="footer">
+
+		</div>
+	</div>
 
     <script src="../source/lantern.js"></script>
+    <script src="model-tests.js"></script>
     <script>
 
       function fetchJSONFile(path, callback) {
@@ -71,8 +117,7 @@
 
       fetchJSONFile('model.json', function(data){
           lantern.loadWorld(data);
-          var player = lantern.findByName('wesley');
-          console.log(player);
+          run_model_tests();
       });
       
     </script>

@@ -6,16 +6,19 @@
       "type": "room",
       "name": "The Lab",
       "description": "You are in a coding lab, there are bit and bytes flying through the air.",
+      "props": {},
       "children": [
         {
           "type": "person",
           "name": "wesley",
           "description": "A coder sitting busy at the terminal.",
+          "props": {},
           "children": [
             {
               "type": "object",
               "name": "mug",
               "description": "A carried coffee mug.",
+              "props": {},
               "children": []
             }
           ]
@@ -24,17 +27,20 @@
           "type": "supporter",
           "name": "desk",
           "description": "A coding desk.",
+          "props": {},
           "children": [
             {
               "type": "object",
               "name": "laptop",
               "description": "A red laptop displaying lines and lines of code.",
+              "props": {},
               "children": []
             },
             {
               "type": "object",
               "name": "mug",
               "description": "A coffee mug.",
+              "props": {},
               "children": []
             }
           ]
