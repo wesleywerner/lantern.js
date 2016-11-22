@@ -127,12 +127,26 @@ lantern = (function(){
       if (typeof this.data.player == 'string') {
         this.data.player = this.findByName(this.data.player);
       }
+      
+      // rebuild the child-parent links
+      _rebuildParents.call(this);
 
     }
     catch (e) {
       console.warn('Could not load the world definition:');
       console.warn(e);
     }
+  }
+  
+  
+  /*
+   * Helper that converts an object name to the object.
+   */
+  function _toObject (name) {
+    if (typeof name == "object")
+      return name;
+    else
+      return _findByName.call(this, name);
   }
     
   
@@ -153,6 +167,35 @@ lantern = (function(){
     return match;
   }
   
+  
+  /*
+   * Find the enclosing room of any item.
+   */
+  function _whichRoom (item) {
+    var search = _toObject.call(this, item);
+    while (search.hasOwnProperty('parent')) {
+      search = _findByName.call(this, search.parent);
+    }
+    return search;
+  }
+  
+  
+  /*
+   * Rebuild the parent list of objects.
+   */
+  function _rebuildParent (o) {
+    o.children.forEach(function(c){
+      c.parent = o.name;
+      _rebuildParent(c);
+    });
+  }
+  function _rebuildParents () {
+    var list = this.data.world;
+    for (var i=0; i<list.length; i++) {
+      _rebuildParent (list[i]);
+    }
+  }
+  
 	
 	/*
    * Return the lantern object.
@@ -163,5 +206,6 @@ lantern = (function(){
     loadWorld: _loadWorld,
     data: null,
     findByName: _findByName,
+    whichRoom: _whichRoom
 	}
 })();
