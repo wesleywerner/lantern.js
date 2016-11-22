@@ -182,17 +182,20 @@ lantern = (function(){
   
   /*
    * Rebuild the parent list of objects.
+   * Call without parameters to iterate all world items.
    */
-  function _rebuildParent (o) {
-    o.children.forEach(function(c){
-      c.parent = o.name;
-      _rebuildParent(c);
-    });
-  }
-  function _rebuildParents () {
-    var list = this.data.world;
-    for (var i=0; i<list.length; i++) {
-      _rebuildParent (list[i]);
+  function _rebuildParents (root) {
+    if (root == null) {
+      var list = this.data.world;
+      for (var i=0; i<list.length; i++) {
+        _rebuildParents (list[i]);
+      }
+    }
+    else {
+      root.children.forEach(function(c){
+        c.parent = root.name;
+        _rebuildParents(c);
+      });
     }
   }
   
