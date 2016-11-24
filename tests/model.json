@@ -65,6 +65,7 @@
           "name": "drawer",
           "description": "A desk drawer.",
           "open": false,
+          "locked": true,
           "scenery": true,
           "props": {},
           "children": [

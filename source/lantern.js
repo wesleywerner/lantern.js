@@ -112,9 +112,18 @@ lantern = (function(){
       ['inventory', 'i'],
       ['examine', 'x'],
 		],
-    vowels: ['a', 'e', 'i', 'o', 'u']
+    vowels: ['a', 'e', 'i', 'o', 'u'],
+    responses: {
+      'is locked': 'It is locked.',
+      'not openable': 'That is not openable',
+      'opened': 'You open it',
+      'already open': 'It is already open.'
+      }
 	};
   
+
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  
+  //  MANAGING WORLD OBJECT HIERARCHY
   
   /*
    * Loads the world model from a JSON string.
@@ -199,6 +208,10 @@ lantern = (function(){
       });
     }
   }
+
+
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  
+  //  VISIBILITY
   
   
   /*
@@ -208,7 +221,37 @@ lantern = (function(){
     var location = _whichRoom.call(this, this.data.player);
     return location.children;
   }
+
   
+  /*
+   * Determine if the children of an object are visible.
+   */
+  function _childrenVisible (item) {
+    var obj = _toObject.call(this, item);
+    // don't list person inventory
+    if (obj.type == 'person') return false;
+    // don't list closed containers
+    if (obj.type == 'container' && obj.open == false) return false;
+    return true;
+  }
+
+
+  /*
+   * Determine if the object is visible.
+   */
+  function _itemVisible (item) {
+    var obj = _toObject.call(this, item);
+    // don't list the player
+    if (obj == this.data.player) return false;
+    // don't list scenery items
+    if (obj.scenery) return false;
+    return true;
+  }
+
+  
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  
+  //  DESCRIBING THINGS
+
   
   /*
    * Describe the given list of things.
@@ -219,7 +262,9 @@ lantern = (function(){
     
     // can't look in closed containers
     if (parent.type == 'container' && parent.open == false) {
-      return 'It is closed.';
+      // try opening the container. This only happens when looking in the container directly, not if it is a child.
+      var result = _openContainer.call(this, parent);
+      if (parent.open == false) return result;
     }
     
     parent.children.forEach(function (listItem) {
@@ -295,29 +340,51 @@ lantern = (function(){
     }
   }
   
+
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  
+  //  EVENTS
   
-  /*
-   * Determine if the children of an object are visible.
-   */
-  function _childrenVisible (item) {
-    var obj = _toObject.call(this, item);
-    // don't list person inventory
-    if (obj.type == 'person') return false;
-    // don't list closed containers
-    if (obj.type == 'container' && obj.open == false) return false;
-    return true;
+  var _events = {};
+  
+  _events.report = function (item, type) {
+    return _response.call(this, type);
   }
 
+  
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  
+  //  WORLD ACTIONS
+  
+  
   /*
-   * Determine if the object is visible.
+   * Get the default response for an event.
    */
-  function _itemVisible (item) {
+  function _response (type) {
+    var response = _options.responses[type] || 'Nothing happens.';
+    return response;
+  }
+  
+  
+  
+  /*
+   * Try open a container.
+   */
+  function _openContainer (item) {
     var obj = _toObject.call(this, item);
-    // don't list the player
-    if (obj == this.data.player) return false;
-    // don't list scenery items
-    if (obj.scenery) return false;
-    return true;
+    var result = 'Nothing happens.';
+    if (obj.type != 'container') {
+      result = _events.report.call(this, item, 'not openable');
+    }
+    else if (obj.open) {
+      result = _events.report.call(this, item, 'already open');
+    }
+    else if (obj.locked) {
+      result = _events.report.call(this, item, 'is locked');
+    }
+    else {
+      obj.open = true;
+      result = _events.report.call(this, item, 'opened');
+    }
+    return result;
   }
   
 	
@@ -331,7 +398,12 @@ lantern = (function(){
     data: null,
     findByName: _findByName,
     whichRoom: _whichRoom,
+    response: _response,
     
+    // events
+    events: _events,
+    
+    // testing
     visibleThings: _visibleThings,
     describeList: _describeList
 	}
