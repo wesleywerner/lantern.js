@@ -25,6 +25,13 @@
         },
         {
           "type": "supporter",
+          "name": "couch",
+          "description": "A sitting couch.",
+          "props": {},
+          "children": []
+        },
+        {
+          "type": "supporter",
           "name": "desk",
           "description": "A coding desk.",
           "props": {},
@@ -33,6 +40,7 @@
               "type": "object",
               "name": "laptop",
               "description": "A red laptop displaying lines and lines of code.",
+              "article": "your",
               "props": {},
               "children": []
             },
@@ -40,6 +48,31 @@
               "type": "object",
               "name": "mug",
               "description": "A coffee mug.",
+              "props": {},
+              "children": []
+            },
+            {
+              "type": "object",
+              "name": "eclair",
+              "description": "A red ballpoint pen.",
+              "props": {},
+              "children": []
+            }
+          ]
+        },
+        {
+          "type": "container",
+          "name": "drawer",
+          "description": "A desk drawer.",
+          "open": false,
+          "scenery": true,
+          "props": {},
+          "children": [
+            {
+              "type": "object",
+              "name": "usb drive",
+              "description": "A disk.",
+              "article": "a",
               "props": {},
               "children": []
             }

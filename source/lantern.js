@@ -112,6 +112,7 @@ lantern = (function(){
       ['inventory', 'i'],
       ['examine', 'x'],
 		],
+    vowels: ['a', 'e', 'i', 'o', 'u']
 	};
   
   
@@ -213,31 +214,102 @@ lantern = (function(){
    * Describe the given list of things.
    */
   function _describeList (list) {
+    var that = this;
     var mentions = [];
-    var iterator = function (children) {
-      children.forEach(function (iteChild) {
-        mentions.push(iteChild.name);
-      });
-    }
+    
     list.forEach(function (listItem) {
-      mentions.push(listItem.name);
-      if (_childrenVisible.call(this, listItem)) {
-        iterator(listItem.children);
+      
+      // stop showing this item if not visible
+      if (_itemVisible.call(that, listItem) == false) {
+        return;
       }
+      
+      var itemName = _withArticle.call(this, listItem);
+      
+      // iterate it's children
+      if (_childrenVisible.call(this, listItem)) {
+        
+        var itemChildren = [];
+        listItem.children.forEach(function (itemChild) {
+          if (_itemVisible.call(that, itemChild)) {
+            itemChildren.push(_withArticle.call(this, itemChild));
+          }
+        });
+        
+        // 
+        if (itemChildren.length > 0) {
+          var prefix = ' (on it ';
+          if (listItem.type == 'container')
+            prefix = ' (inside it ';
+          mentions.push(itemName + prefix + _joinNames(itemChildren) + ')');
+        }
+        else {
+          mentions.push(itemName);
+        }
+      
+      }
+      else {
+        mentions.push(itemName);
+      }
+      
     });
-    return mentions.join();
+    return _joinNames(mentions);
   }
   
   
   /*
-   * Determine if the children of an object should be listed.
+   * Joins an array of items to read naturally.
+   */
+  function _joinNames (arr) {
+    if (arr.length == 0) {
+      return '';
+    } else if (arr.length < 3) {
+      return arr.join(' and ');
+    } else {
+      var s = arr.slice(0, -1).join(', ');
+      s = s + ' and ' + arr.slice(-1);
+      return s;
+    }
+  }
+  
+  
+  /*
+   * Returns the given name with the article prefixed.
+   */
+  function _withArticle (item) {
+    var obj = _toObject.call(this, item);
+    if (obj.article) {
+      return obj.article + ' ' + obj.name;
+    } else {
+      if (_options.vowels.indexOf(obj.name[0].toLowerCase()) == -1)
+        return 'a ' + obj.name;
+      else
+        return 'an ' + obj.name;
+    }
+  }
+  
+  
+  /*
+   * Determine if the children of an object are visible.
    */
   function _childrenVisible (item) {
     var obj = _toObject.call(this, item);
     // don't list person inventory
     if (obj.type == 'person') return false;
     // don't list closed containers
-    if (obj.type == 'container' && obj.props.closed) return false;
+    if (obj.type == 'container' && obj.open == false) return false;
+    return true;
+  }
+
+  /*
+   * Determine if the object is visible.
+   */
+  function _itemVisible (item) {
+    var obj = _toObject.call(this, item);
+    // don't list the player
+    if (obj == this.data.player) return false;
+    // don't list scenery items
+    if (obj.scenery) return false;
     return true;
   }
   

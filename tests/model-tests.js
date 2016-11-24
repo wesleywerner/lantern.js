@@ -33,7 +33,7 @@ function run_model_tests () {
   logtitle('Test visible room items');
   var described = lantern.describeList(lantern.whichRoom(lantern.data.player).children);
   logresult(described);
-  var expected = "wesley,desk,laptop,mug";
+  var expected = "a couch and a desk (on it your laptop, a mug and an eclair)";
   if (described == expected)
     logsuccess();
   else
