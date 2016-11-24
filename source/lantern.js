@@ -213,11 +213,16 @@ lantern = (function(){
   /*
    * Describe the given list of things.
    */
-  function _describeList (list) {
+  function _describeList (parent) {
     var that = this;
     var mentions = [];
     
-    list.forEach(function (listItem) {
+    // can't look in closed containers
+    if (parent.type == 'container' && parent.open == false) {
+      return 'It is closed.';
+    }
+    
+    parent.children.forEach(function (listItem) {
       
       // stop showing this item if not visible
       if (_itemVisible.call(that, listItem) == false) {
@@ -236,11 +241,10 @@ lantern = (function(){
           }
         });
         
-        // 
+        // list the children
         if (itemChildren.length > 0) {
           var prefix = ' (on it ';
-          if (listItem.type == 'container')
-            prefix = ' (inside it ';
+          if (listItem.type == 'container') prefix = ' (inside it ';
           mentions.push(itemName + prefix + _joinNames(itemChildren) + ')');
         }
         else {
@@ -253,7 +257,10 @@ lantern = (function(){
       }
       
     });
-    return _joinNames(mentions);
+    
+    var lead = 'You see ';
+    if (parent.type == 'container') lead = 'Inside it you see ';
+    return lead + _joinNames(mentions) + '.';
   }
   
   

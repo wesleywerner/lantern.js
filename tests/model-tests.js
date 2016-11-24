@@ -30,10 +30,39 @@ function logtitle(m) {
 	logel.appendChild(el);
 }
 function run_model_tests () {
-  logtitle('Test visible room items');
-  var described = lantern.describeList(lantern.whichRoom(lantern.data.player).children);
+  test_visible_room_items();
+  test_closed_container_items();
+  test_open_container_items();
+}
+function test_open_container_items() {
+  logtitle('Test open container items');
+  var drawer = lantern.findByName('drawer');
+  drawer.open = true;
+  var described = lantern.describeList(drawer);
   logresult(described);
-  var expected = "a couch and a desk (on it your laptop, a mug and an eclair)";
+  var expected = 'Inside it you see a usb drive.';
+  if (described == expected)
+    logsuccess();
+  else
+    logexpected(expected);
+}
+function test_closed_container_items() {
+  logtitle('Test closed container items');
+  var drawer = lantern.findByName('drawer');
+  drawer.open = false;
+  var described = lantern.describeList(drawer);
+  logresult(described);
+  var expected = 'It is closed.';
+  if (described == expected)
+    logsuccess();
+  else
+    logexpected(expected);
+}
+function test_visible_room_items() {
+  logtitle('Test visible room items');
+  var described = lantern.describeList(lantern.whichRoom(lantern.data.player));
+  logresult(described);
+  var expected = 'You see a couch and a desk (on it your laptop, a mug and an eclair).';
   if (described == expected)
     logsuccess();
   else
