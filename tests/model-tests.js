@@ -34,15 +34,12 @@ function run_model_tests () {
   test_closed_locked_container_items();
   test_closed_unlocked_container_items();
   test_open_container_items();
-  test_looking();
   test_boiling();
 }
 function test_boiling() {
-  console.log( lantern.boilItem( lantern.findByName('The Lab') ));
-}
-function test_looking() {
-  logtitle('Test looking');
-  lantern.turn('look');
+  logtitle('Test boiling');
+  var boiled = lantern.boilItem(lantern.findByName('The Lab'));
+  logresult(JSON.stringify(boiled));
 }
 function test_open_container_items() {
   logtitle('Test listing open container items');
@@ -84,7 +81,8 @@ function test_closed_unlocked_container_items() {
 }
 function test_visible_room_items() {
   logtitle('Test visible room items');
-  var described = lantern.describeList(lantern.whichRoom(lantern.data.player));
+  var room = lantern.boilItem( lantern.whichRoom(lantern.data.player) );
+  var described = lantern.describeList(room);
   logresult(described);
   var expected = 'You see a couch and a desk (on it your laptop, a mug and an eclair).';
   if (described == expected)

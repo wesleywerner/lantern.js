@@ -260,6 +260,12 @@ lantern = (function(){
         continue;
       }
       
+      // ignore the player
+      if (child.name == this.data.player.name) {
+        copy.children.splice(i, 1);
+        continue;
+      }
+      
       // iterate grand children
       for (var n=0; n<child.children.length; n++) {
         if (_itemVisible.call(that, child.children[n]) == false) {
@@ -292,33 +298,18 @@ lantern = (function(){
     
     parent.children.forEach(function (listItem) {
       
-      // stop showing this item if not visible
-      if (_itemVisible.call(that, listItem) == false) {
-        return;
-      }
-      
       var itemName = _withArticle.call(this, listItem);
       
-      // iterate it's children
-      if (_childrenVisible.call(this, listItem)) {
-        
-        var itemChildren = [];
-        listItem.children.forEach(function (itemChild) {
-          if (_itemVisible.call(that, itemChild)) {
-            itemChildren.push(_withArticle.call(this, itemChild));
-          }
-        });
-        
-        // list the children
-        if (itemChildren.length > 0) {
-          var prefix = ' (on it ';
-          if (listItem.type == 'container') prefix = ' (inside it ';
-          mentions.push(itemName + prefix + _joinNames(itemChildren) + ')');
-        }
-        else {
-          mentions.push(itemName);
-        }
+      var itemChildren = [];
+      listItem.children.forEach(function (itemChild) {
+        itemChildren.push(_withArticle.call(this, itemChild));
+      });
       
+      // list the children
+      if (itemChildren.length > 0) {
+        var prefix = ' (on it ';
+        if (listItem.type == 'container') prefix = ' (inside it ';
+        mentions.push(itemName + prefix + _joinNames(itemChildren) + ')');
       }
       else {
         mentions.push(itemName);
