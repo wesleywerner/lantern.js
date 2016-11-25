@@ -352,7 +352,10 @@ lantern = (function(){
    */
   function _withArticle (item) {
     var obj = _toObject.call(this, item);
-    if (obj.article) {
+    if (obj.type == 'person') {
+      return obj.name;
+    }
+    else if (obj.article) {
       return obj.article + ' ' + obj.name;
     } else {
       if (_options.vowels.indexOf(obj.name[0].toLowerCase()) == -1)

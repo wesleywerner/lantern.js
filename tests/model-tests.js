@@ -84,7 +84,7 @@ function test_visible_room_items() {
   var room = lantern.boilItem( lantern.whichRoom(lantern.data.player) );
   var described = lantern.describeList(room);
   logresult(described);
-  var expected = 'You see a couch and a desk (on it your laptop, a mug and an eclair).';
+  var expected = 'You see neo, a couch and a desk (on it your laptop, a mug and an eclair).';
   if (described == expected)
     logsuccess();
   else
