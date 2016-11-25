@@ -104,11 +104,17 @@
     <script src="model-tests.js"></script>
     <script>
 
-      lantern.events.report = function (item, type) {
-        console.log(item.name, type);
-        return lantern.response(type);
+      // Overwrite the default action response.
+      //lantern.events.getActionResponse = function (item, type) {
+      //  console.log(item.name, type);
+      //  return lantern.response(type);
+      //}
+      
+      // Hook into the description report
+      lantern.events.reportDescription = function (item, description) {
+        console.log(description);
       }
-
+      
       function fetchJSONFile(path, callback) {
           var httpRequest = new XMLHttpRequest();
           httpRequest.onreadystatechange = function() {

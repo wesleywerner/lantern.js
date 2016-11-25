@@ -22,9 +22,35 @@ var lantern = lantern || {};
 lantern = (function(){
 	
 	/*
+   * Define various options that lantern looks at during world simulation.
+   */
+	var _options = {
+		ignores: ['an', 'a', 'the', 'for', 'to', 'at', 'of', 'with', 'about', 'on'],
+		synonymns: [
+			['attack', 'hit', 'smash', 'kick', 'cut', 'kill'],
+			['insert', 'put'],
+      ['take', 'get', 'pick'],
+      ['inventory', 'i'],
+      ['examine', 'x'],
+		],
+    vowels: ['a', 'e', 'i', 'o', 'u'],
+    responses: {
+      'locked': 'It is locked.',
+      'not openable': 'That is not openable',
+      'opened': 'You open it',
+      'already open': 'It is already open.'
+      }
+	};
+  
+
+  //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  
+  //  PARSER
+
+
+	/*
    * A basic parser that understands verbs, directions and nouns, and translates these into an action object.
    */
-	function parse (sentence, known_nouns) {
+	function _parse (sentence, known_nouns) {
 		
 		if (sentence == null) return;
 		var directions = [
@@ -89,39 +115,6 @@ lantern = (function(){
 	}
 	
 	
-	/*
-   * looks at a parsed action and decides which objects to act upon.
-   * It should be aware of the things visible in the current room.
-   * It will also handle special cases where the verb acts upon the player, or the current room.
-   */
-	function _interpret (sentence, known_nouns) {
-		var translation = parse(sentence, known_nouns);
-		return translation;
-	}
-	
-  
-	/*
-   * Define various options that lantern looks at during world simulation.
-   */
-	var _options = {
-		ignores: ['an', 'a', 'the', 'for', 'to', 'at', 'of', 'with', 'about', 'on'],
-		synonymns: [
-			['attack', 'hit', 'smash', 'kick', 'cut', 'kill'],
-			['insert', 'put'],
-      ['take', 'get', 'pick'],
-      ['inventory', 'i'],
-      ['examine', 'x'],
-		],
-    vowels: ['a', 'e', 'i', 'o', 'u'],
-    responses: {
-      'is locked': 'It is locked.',
-      'not openable': 'That is not openable',
-      'opened': 'You open it',
-      'already open': 'It is already open.'
-      }
-	};
-  
-
   //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  
   //  MANAGING WORLD OBJECT HIERARCHY
   
@@ -215,11 +208,10 @@ lantern = (function(){
   
   
   /*
-   * Get a list of all visible things in the player's location.
+   * Get a list of all visible things in the player's room.
    */
-  function _visibleThings () {
-    var location = _whichRoom.call(this, this.data.player);
-    return location.children;
+  function _currentRoom () {
+    return _whichRoom.call(this, this.data.player);
   }
 
   
@@ -246,6 +238,37 @@ lantern = (function(){
     // don't list scenery items
     if (obj.scenery) return false;
     return true;
+  }
+  
+  
+  /*
+   * Boils an item down to only it's visible parts.
+   * Mainly used when returning an item to the player.
+   */
+  function _boilItem (parent) {
+    
+    var that = this;
+    var copy = JSON.parse(JSON.stringify(parent))
+    
+    for (var i=0; i<copy.children.length; i++) {
+    
+      var child = copy.children[i];
+      
+      // if this child is not visible
+      if (_itemVisible.call(that, child) == false) {
+        copy.children.splice(i, 1);
+        continue;
+      }
+      
+      // iterate grand children
+      for (var n=0; n<child.children.length; n++) {
+        if (_itemVisible.call(that, child.children[n]) == false) {
+          child.children.splice(n, 1);
+        }
+      };
+
+    };
+    return copy;
   }
 
   
@@ -346,14 +369,47 @@ lantern = (function(){
   
   var _events = {};
   
-  _events.report = function (item, type) {
+  /*
+   * Called whenever an action against an item gives feedback.
+   */
+  _events.getActionResponse = function (item, type) {
     return _response.call(this, type);
+  }
+  
+  /*
+   * Called when a turn requires the room to be put into words.
+   * The object passed is a trimmed copy which only contains childred
+   * visible to the player.
+   */
+  _events.getDescription = function (item) {
+    return item.description + '\n\n' + _describeList.call(this, item);
+    //if (item.type == 'room') desc = item.description;
+    
   }
 
   
   //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  
   //  WORLD ACTIONS
   
+  
+	/*
+   * looks at a parsed action and decides which objects to act upon.
+   * It should be aware of the things visible in the current room.
+   * It will also handle special cases where the verb acts upon the player, or the current room.
+   */
+	function _turn (sentence, known_nouns) {
+		var translation = _parse.call(this, sentence, known_nouns);
+    // perform some action
+    // TODO actions
+    // Boil the room down
+    var boiledRoom = _boilItem.call(this, _currentRoom.call(this));
+    // TODO boiling
+    // Put the room into words
+    var description = _events.getDescription.call(this, boiledRoom);
+    _events.reportDescription(boiledRoom, description);
+		return translation;
+	}
+	
   
   /*
    * Get the default response for an event.
@@ -363,8 +419,7 @@ lantern = (function(){
     return response;
   }
   
-  
-  
+    
   /*
    * Try open a container.
    */
@@ -372,17 +427,17 @@ lantern = (function(){
     var obj = _toObject.call(this, item);
     var result = 'Nothing happens.';
     if (obj.type != 'container') {
-      result = _events.report.call(this, item, 'not openable');
+      result = _events.getActionResponse.call(this, item, 'not openable');
     }
     else if (obj.open) {
-      result = _events.report.call(this, item, 'already open');
+      result = _events.getActionResponse.call(this, item, 'already open');
     }
     else if (obj.locked) {
-      result = _events.report.call(this, item, 'is locked');
+      result = _events.getActionResponse.call(this, item, 'locked');
     }
     else {
       obj.open = true;
-      result = _events.report.call(this, item, 'opened');
+      result = _events.getActionResponse.call(this, item, 'opened');
     }
     return result;
   }
@@ -393,7 +448,7 @@ lantern = (function(){
    */
 	var obj = {
 		options: _options,
-		turn: _interpret,
+		turn: _turn,
     loadWorld: _loadWorld,
     data: null,
     response: _response,
@@ -402,10 +457,11 @@ lantern = (function(){
   
   // Add debugging functions to the lantern object if LANTERN_DEBUG is truthy.
   if (typeof LANTERN_DEBUG !== 'undefined' && LANTERN_DEBUG == true) {
-    obj.visibleThings = _visibleThings;
     obj.describeList = _describeList;
     obj.findByName = _findByName;
     obj.whichRoom = _whichRoom;
+    obj.parse = _parse;
+    obj.boilItem = _boilItem;
 	}
   
   return obj;

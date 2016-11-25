@@ -21,7 +21,7 @@ function loghead(m, cls) {
 function run_test(sentence, known_nouns, expected) {
 	if (logel == undefined) throw 'the log element is not found';
 	loghead(sentence, 'test');
-  o = lantern.turn(sentence, known_nouns);
+  o = lantern.parse(sentence, known_nouns);
 	loghead(JSON.stringify(o), 'test-detail');
   //console.log(o);
   assert(o.verb, expected.verb, 'wrong verb, ');
