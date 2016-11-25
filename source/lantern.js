@@ -391,20 +391,23 @@ lantern = (function(){
 	/*
    * Return the lantern object.
    */
-	return {
+	var obj = {
 		options: _options,
 		turn: _interpret,
     loadWorld: _loadWorld,
     data: null,
-    findByName: _findByName,
-    whichRoom: _whichRoom,
     response: _response,
-    
-    // events
-    events: _events,
-    
-    // testing
-    visibleThings: _visibleThings,
-    describeList: _describeList
+    events: _events
+  }
+  
+  // Add debugging functions to the lantern object if LANTERN_DEBUG is truthy.
+  if (typeof LANTERN_DEBUG !== 'undefined' && LANTERN_DEBUG == true) {
+    obj.visibleThings = _visibleThings;
+    obj.describeList = _describeList;
+    obj.findByName = _findByName;
+    obj.whichRoom = _whichRoom;
 	}
+  
+  return obj;
+  
 })();
