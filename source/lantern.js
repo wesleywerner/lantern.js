@@ -257,12 +257,20 @@ lantern = (function(){
       // if this child is not visible
       if (_itemVisible.call(that, child) == false) {
         copy.children.splice(i, 1);
+        i--;
         continue;
       }
       
       // ignore the player
       if (child.name == this.data.player.name) {
         copy.children.splice(i, 1);
+        i--;
+        continue;
+      }
+      
+      // hide what other people carry
+      if (child.type == 'person') {
+        child.children = [];
         continue;
       }
       

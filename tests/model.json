@@ -24,6 +24,21 @@
           ]
         },
         {
+          "type": "person",
+          "name": "neo",
+          "description": "The chosen one.",
+          "props": {},
+          "children": [
+            {
+              "type": "object",
+              "name": "spoon",
+              "description": "It is a little bent.",
+              "props": {},
+              "children": []
+            }
+          ]
+        },
+        {
           "type": "supporter",
           "name": "couch",
           "description": "A sitting couch.",
