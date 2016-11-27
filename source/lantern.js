@@ -268,8 +268,8 @@ lantern = (function(){
         continue;
       }
       
-      // hide what other people carry
-      if (child.type == 'person') {
+      // hide children
+      if (_childrenVisible.call(this, child) == false) {
         child.children = [];
         continue;
       }
