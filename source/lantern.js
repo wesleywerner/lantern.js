@@ -201,6 +201,21 @@ lantern = (function(){
       });
     }
   }
+  
+  
+  /*
+   * Get the list of visible nouns (the current room is assumed when no parent is specified).
+   * Does not consider visiblity of things in closed containers.
+   */
+  function _locationNouns (parent) {
+    var nouns = [];
+    if (parent) nouns.push(parent.name);
+    parent = parent || _currentRoom.call(this);
+    for (var n=0; n<parent.children.length; n++) {
+      nouns = nouns.concat( _locationNouns.call(this, parent.children[n]) );
+    }
+    return nouns;
+  }
 
 
   //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  
@@ -400,6 +415,7 @@ lantern = (function(){
    * It will also handle special cases where the verb acts upon the player, or the current room.
    */
 	function _turn (sentence, known_nouns) {
+    known_nouns = known_nouns || _locationNouns.call(this);
 		var translation = _parse.call(this, sentence, known_nouns);
     // perform some action
     // TODO actions
@@ -464,6 +480,7 @@ lantern = (function(){
     obj.whichRoom = _whichRoom;
     obj.parse = _parse;
     obj.boilItem = _boilItem;
+    obj.locationNouns = _locationNouns;
 	}
   
   return obj;

@@ -133,6 +133,19 @@
           run_model_tests();
       });
       
+      function submit_sentence() {
+        var inel = document.getElementById('user_input');
+        var outel = document.getElementById('parsed_result');
+        var knownNouns = lantern.locationNouns();
+        var translation = lantern.parse(inel.value, knownNouns);
+        var target = lantern.findByName(translation.item);
+        if (target == null)
+          outel.innerHTML = 'Verb:' + translation.verb + ', no item matched.';
+        else
+          outel.innerHTML = 'Verb:' + translation.verb + ', item:' + target.type + ' ' + target.name;
+        inel.value = '';
+        return false;
+      }
     </script>
 </body>
 
