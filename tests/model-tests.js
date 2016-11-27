@@ -31,9 +31,9 @@ function logtitle(m) {
 }
 function run_model_tests () {
   test_visible_room_items();
-  test_closed_locked_container_items();
   test_closed_unlocked_container_items();
   test_open_container_items();
+  test_closed_locked_container_items();
   test_boiling();
 }
 function test_boiling() {

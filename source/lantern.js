@@ -172,6 +172,29 @@ lantern = (function(){
   
   
   /*
+   * Find an item by name limited to room scope.
+   */
+  function _findInScope (name, parentChildren) {
+    var list = parentChildren;
+    var match = null;
+    if (parentChildren == undefined) {
+      var room = _currentRoom.call(this);
+      var boiled = _boilItem.call(this, room);
+      list = boiled.children;
+    }
+    for (var i=0; i<list.length; i++) {
+      if (match != null) break;
+      var item = list[i];
+      if (item.name == name)
+        match = item;
+      else
+        match = _findInScope.call(this, name, item.children);
+    }
+    return match;
+  }
+  
+  
+  /*
    * Find the enclosing room of any item.
    */
   function _whichRoom (item) {
@@ -250,8 +273,6 @@ lantern = (function(){
     var obj = _toObject.call(this, item);
     // don't list the player
     if (obj == this.data.player) return false;
-    // don't list scenery items
-    if (obj.scenery) return false;
     return true;
   }
   
@@ -321,23 +342,27 @@ lantern = (function(){
     
     parent.children.forEach(function (listItem) {
       
-      var itemName = _withArticle.call(this, listItem);
+      // ignoring scenery items
+      if (listItem.scenery == undefined || listItem.scenery == false) {
+        
+        var itemName = _withArticle.call(this, listItem);
+        
+        var itemChildren = [];
+        listItem.children.forEach(function (itemChild) {
+          itemChildren.push(_withArticle.call(this, itemChild));
+        });
+        
+        // list the children
+        if (itemChildren.length > 0) {
+          var prefix = ' (on it ';
+          if (listItem.type == 'container') prefix = ' (inside it ';
+          mentions.push(itemName + prefix + _joinNames(itemChildren) + ')');
+        }
+        else {
+          mentions.push(itemName);
+        }
       
-      var itemChildren = [];
-      listItem.children.forEach(function (itemChild) {
-        itemChildren.push(_withArticle.call(this, itemChild));
-      });
-      
-      // list the children
-      if (itemChildren.length > 0) {
-        var prefix = ' (on it ';
-        if (listItem.type == 'container') prefix = ' (inside it ';
-        mentions.push(itemName + prefix + _joinNames(itemChildren) + ')');
       }
-      else {
-        mentions.push(itemName);
-      }
-      
     });
     
     var lead = 'You see ';
@@ -415,13 +440,14 @@ lantern = (function(){
    * It will also handle special cases where the verb acts upon the player, or the current room.
    */
 	function _turn (sentence, known_nouns) {
+    // parse the sentence
     known_nouns = known_nouns || _locationNouns.call(this);
 		var translation = _parse.call(this, sentence, known_nouns);
-    // perform some action
-    // TODO actions
     // Boil the room down
     var boiledRoom = _boilItem.call(this, _currentRoom.call(this));
-    // TODO boiling
+    // match all items
+    var item = _findInScope.call(this, translation.item);
+    console.log(item);
     // Put the room into words
     var description = _events.getDescription.call(this, boiledRoom);
     _events.reportDescription(boiledRoom, description);
