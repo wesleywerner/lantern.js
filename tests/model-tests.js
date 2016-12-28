@@ -30,10 +30,15 @@ function logtitle(m) {
 	logel.appendChild(el);
 }
 function run_model_tests () {
+  lantern.loadWorld(window.testData);
   test_visible_room_items();
+  lantern.loadWorld(window.testData);
   test_closed_unlocked_container_items();
+  lantern.loadWorld(window.testData);
   test_open_container_items();
+  lantern.loadWorld(window.testData);
   test_closed_locked_container_items();
+  lantern.loadWorld(window.testData);
   test_boiling();
 }
 function test_boiling() {

@@ -129,7 +129,7 @@
       }
 
       fetchJSONFile('model.json', function(data){
-          lantern.loadWorld(data);
+          window.testData = data;
           run_model_tests();
       });
       
