@@ -174,14 +174,20 @@ lantern = (function(){
   /*
    * Find an item by name limited to room scope.
    */
-  function _findInScope (name, parentChildren) {
-    var list = parentChildren;
+  function _findInScope (name, scope) {
+    var list = scope;
     var match = null;
-    if (parentChildren == undefined) {
-      var room = _currentRoom.call(this);
-      var boiled = _boilItem.call(this, room);
-      list = boiled.children;
+    
+    // check that the scope is given
+    if (scope == undefined) {
+      throw ('findInScope() requires the scope parameter, a parent object or an array of children to search.');
     }
+    
+    // ensure the scope points to an array of children
+    if (typeof scope == 'object' && scope.hasOwnProperty('children')) {
+      list = scope.children;
+    }
+    
     for (var i=0; i<list.length; i++) {
       if (match != null) break;
       var item = list[i];
@@ -420,7 +426,7 @@ lantern = (function(){
   
   /*
    * Called when a turn requires the room to be put into words.
-   * The object passed is a trimmed copy which only contains childred
+   * The object passed is a trimmed copy which only contains children
    * visible to the player.
    */
   _events.getDescription = function (item) {
@@ -446,7 +452,7 @@ lantern = (function(){
     // Boil the room down
     var boiledRoom = _boilItem.call(this, _currentRoom.call(this));
     // match all items
-    var item = _findInScope.call(this, translation.item);
+    var item = _findInScope.call(this, translation.item, boiledRoom);
     console.log(item);
     // Put the room into words
     var description = _events.getDescription.call(this, boiledRoom);
