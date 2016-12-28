@@ -80,8 +80,8 @@
           "type": "container",
           "name": "drawer",
           "description": "A desk drawer.",
-          "open": false,
-          "locked": true,
+          "open": true,
+          "locked": false,
           "scenery": true,
           "props": {},
           "children": [

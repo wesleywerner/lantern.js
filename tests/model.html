@@ -115,6 +115,11 @@
         console.log(description);
       }
       
+      // Hook into item actions
+      lantern.events.actionItem = function (item, verb) {
+        console.log( 'You '+verb+' the '+item.name+' but nothing happens.' );
+      }
+      
       function fetchJSONFile(path, callback) {
           var httpRequest = new XMLHttpRequest();
           httpRequest.onreadystatechange = function() {
@@ -136,13 +141,15 @@
       function submit_sentence() {
         var inel = document.getElementById('user_input');
         var outel = document.getElementById('parsed_result');
-        var knownNouns = lantern.locationNouns();
-        var translation = lantern.parse(inel.value, knownNouns);
-        var target = lantern.findByName(translation.item);
-        if (target == null)
-          outel.innerHTML = 'Verb:' + translation.verb + ', no item matched.';
-        else
-          outel.innerHTML = 'Verb:' + translation.verb + ', item:' + target.type + ' ' + target.name;
+        var result = lantern.turn(inel.value);
+        outel.innerHTML = JSON.stringify(result.item);
+        //var knownNouns = lantern.locationNouns();
+        //var translation = lantern.parse(inel.value, knownNouns);
+        //var target = lantern.findByName(translation.item);
+        //if (target == null)
+        //  outel.innerHTML = 'Verb:' + translation.verb + ', no item matched.';
+        //else
+        //  outel.innerHTML = 'Verb:' + translation.verb + ', item:' + target.type + ' ' + target.name;
         inel.value = '';
         return false;
       }

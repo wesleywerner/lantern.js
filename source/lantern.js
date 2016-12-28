@@ -31,14 +31,15 @@ lantern = (function(){
 			['insert', 'put'],
       ['take', 'get', 'pick'],
       ['inventory', 'i'],
-      ['examine', 'x'],
+      ['examine', 'x', 'l', 'look'],
 		],
     vowels: ['a', 'e', 'i', 'o', 'u'],
     responses: {
       'locked': 'It is locked.',
       'not openable': 'That is not openable',
       'opened': 'You open it',
-      'already open': 'It is already open.'
+      'already open': 'It is already open.',
+      'no such thing': 'You don\'t see any such thing'
       }
 	};
   
@@ -371,9 +372,15 @@ lantern = (function(){
       }
     });
     
-    var lead = 'You see ';
-    if (parent.type == 'container') lead = 'Inside it you see ';
-    return lead + _joinNames(mentions) + '.';
+    if (mentions.length == 0) {
+      return '';
+    }
+    else {
+      var lead = 'You see ';
+      if (parent.type == 'supporter') lead = 'On it is ';
+      if (parent.type == 'container') lead = 'Inside it is ';
+      return lead + _joinNames(mentions) + '.';
+    }
   }
   
   
@@ -418,11 +425,13 @@ lantern = (function(){
   var _events = {};
   
   /*
-   * Called whenever an action against an item gives feedback.
+   * Get the default response for an event.
    */
-  _events.getActionResponse = function (item, type) {
-    return _response.call(this, type);
+  _events.getDefaultResponse = function (item, type) {
+    var response = _options.responses[type] || 'Nothing happens.';
+    return response;
   }
+  
   
   /*
    * Called when a turn requires the room to be put into words.
@@ -430,11 +439,17 @@ lantern = (function(){
    * visible to the player.
    */
   _events.getDescription = function (item) {
-    return item.description + '\n\n' + _describeList.call(this, item);
-    //if (item.type == 'room') desc = item.description;
-    
+    return item.description + ' ' + _describeList.call(this, item);
   }
-
+  
+  
+  /*
+   * Game action against some item.
+   */
+  _events.actionItem = function (item, verb) {
+    return 'You '+verb+' the '+item.name+' but nothing happens.';
+  }
+  
   
   //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  
   //  WORLD ACTIONS
@@ -451,25 +466,40 @@ lantern = (function(){
 		var translation = _parse.call(this, sentence, known_nouns);
     // Boil the room down
     var boiledRoom = _boilItem.call(this, _currentRoom.call(this));
-    // match all items
+    // match the item by name
     var item = _findInScope.call(this, translation.item, boiledRoom);
-    console.log(item);
-    // Put the room into words
-    var description = _events.getDescription.call(this, boiledRoom);
-    _events.reportDescription(boiledRoom, description);
-		return translation;
+    // an empty translation item defaults to the current location
+    if (translation.item == null) {
+      // Put the room into words
+      var description = _events.getDescription.call(this, boiledRoom);
+      _events.reportDescription(boiledRoom, description);
+    }
+    else {
+      if (item == null) {
+        // the item is not visible
+        var description = _events.getDefaultResponse.call(this, item, 'no such thing');
+        _events.reportDescription(boiledRoom, description);
+      }
+      else {
+        if (translation.verb == 'examine') {
+          // Examine the item in question
+          var description = _events.getDescription.call(this, item);
+          _events.reportDescription(item, description);
+        }
+        else {
+          // Perform some other perfunctionary action
+          _events.actionItem(item, translation.verb);
+        }
+      }
+    }
+		return {
+      translation:translation,
+      room:boiledRoom,
+      item:item
+      };
 	}
 	
   
-  /*
-   * Get the default response for an event.
-   */
-  function _response (type) {
-    var response = _options.responses[type] || 'Nothing happens.';
-    return response;
-  }
-  
-    
   /*
    * Try open a container.
    */
@@ -477,17 +507,17 @@ lantern = (function(){
     var obj = _toObject.call(this, item);
     var result = 'Nothing happens.';
     if (obj.type != 'container') {
-      result = _events.getActionResponse.call(this, item, 'not openable');
+      result = _events.getDefaultResponse.call(this, item, 'not openable');
     }
     else if (obj.open) {
-      result = _events.getActionResponse.call(this, item, 'already open');
+      result = _events.getDefaultResponse.call(this, item, 'already open');
     }
     else if (obj.locked) {
-      result = _events.getActionResponse.call(this, item, 'locked');
+      result = _events.getDefaultResponse.call(this, item, 'locked');
     }
     else {
       obj.open = true;
-      result = _events.getActionResponse.call(this, item, 'opened');
+      result = _events.getDefaultResponse.call(this, item, 'opened');
     }
     return result;
   }
@@ -501,7 +531,6 @@ lantern = (function(){
 		turn: _turn,
     loadWorld: _loadWorld,
     data: null,
-    response: _response,
     events: _events
   }
   

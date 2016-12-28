@@ -52,7 +52,7 @@ function test_open_container_items() {
   drawer.open = true;
   var described = lantern.describeList(drawer);
   logresult(described);
-  var expected = 'Inside it you see a usb drive.';
+  var expected = 'Inside it is a usb drive.';
   if (described == expected)
     logsuccess();
   else
@@ -72,13 +72,13 @@ function test_closed_locked_container_items() {
     logexpected(expected);
 }
 function test_closed_unlocked_container_items() {
-  logtitle('Test listing closed lock container items');
+  logtitle('Test listing closed unlocked container items');
   var drawer = lantern.findByName('drawer');
   drawer.open = false;
   drawer.locked = false;
   var described = lantern.describeList(drawer);
   logresult(described);
-  var expected = 'Inside it you see a usb drive.';
+  var expected = 'Inside it is a usb drive.';
   if (described == expected)
     logsuccess();
   else
