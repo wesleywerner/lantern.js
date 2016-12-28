@@ -84,9 +84,6 @@
 			<button type="submit">parse</button>
 			<div id="parsed_result"></div>
 			</form>
-  
-    <p>...</p>
-
 		</div>
 		
 		<div id="sidebar">
@@ -111,14 +108,15 @@
       //}
       
       // Hook into the description report
-      lantern.events.reportDescription = function (item, description) {
-        console.log(description);
+      lantern.events.report = function (message) {
+        var outel = document.getElementById('parsed_result');
+        outel.innerHTML = message;
       }
       
       // Hook into item actions
-      lantern.events.actionItem = function (item, verb) {
-        console.log( 'You '+verb+' the '+item.name+' but nothing happens.' );
-      }
+      //lantern.events.action = function (item, verb) {
+      //  return 'You '+verb+' the '+item.name+' but nothing happens.' ;
+      //}
       
       function fetchJSONFile(path, callback) {
           var httpRequest = new XMLHttpRequest();
@@ -142,14 +140,6 @@
         var inel = document.getElementById('user_input');
         var outel = document.getElementById('parsed_result');
         var result = lantern.turn(inel.value);
-        outel.innerHTML = JSON.stringify(result.item);
-        //var knownNouns = lantern.locationNouns();
-        //var translation = lantern.parse(inel.value, knownNouns);
-        //var target = lantern.findByName(translation.item);
-        //if (target == null)
-        //  outel.innerHTML = 'Verb:' + translation.verb + ', no item matched.';
-        //else
-        //  outel.innerHTML = 'Verb:' + translation.verb + ', item:' + target.type + ' ' + target.name;
         inel.value = '';
         return false;
       }

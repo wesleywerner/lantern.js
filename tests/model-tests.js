@@ -50,7 +50,7 @@ function test_open_container_items() {
   logtitle('Test listing open container items');
   var drawer = lantern.findByName('drawer');
   drawer.open = true;
-  var described = lantern.describeList(drawer);
+  var described = lantern.listContents(drawer);
   logresult(described);
   var expected = 'Inside it is a usb drive.';
   if (described == expected)
@@ -63,7 +63,7 @@ function test_closed_locked_container_items() {
   var drawer = lantern.findByName('drawer');
   drawer.open = false;
   drawer.locked = true;
-  var described = lantern.describeList(drawer);
+  var described = lantern.listContents(drawer);
   logresult(described);
   var expected = 'It is locked.';
   if (described == expected)
@@ -76,7 +76,7 @@ function test_closed_unlocked_container_items() {
   var drawer = lantern.findByName('drawer');
   drawer.open = false;
   drawer.locked = false;
-  var described = lantern.describeList(drawer);
+  var described = lantern.listContents(drawer);
   logresult(described);
   var expected = 'Inside it is a usb drive.';
   if (described == expected)
@@ -87,7 +87,7 @@ function test_closed_unlocked_container_items() {
 function test_visible_room_items() {
   logtitle('Test visible room items');
   var room = lantern.boilItem( lantern.whichRoom(lantern.data.player) );
-  var described = lantern.describeList(room);
+  var described = lantern.listContents(room);
   logresult(described);
   var expected = 'You see neo, a couch and a desk (on it your laptop, a mug and an eclair).';
   if (described == expected)

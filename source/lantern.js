@@ -137,8 +137,7 @@ lantern = (function(){
 
     }
     catch (e) {
-      console.warn('Could not load the world definition:');
-      console.warn(e);
+      console.warn('Could not load the world definition: ' + e);
     }
   }
   
@@ -336,7 +335,7 @@ lantern = (function(){
   /*
    * Describe the given list of things.
    */
-  function _describeList (parent) {
+  function _listContents (parent) {
     var that = this;
     var mentions = [];
     
@@ -434,20 +433,26 @@ lantern = (function(){
   
   
   /*
-   * Called when a turn requires the room to be put into words.
-   * The object passed is a trimmed copy which only contains children
-   * visible to the player.
+   * Convert an item into words.
    */
   _events.getDescription = function (item) {
-    return item.description + ' ' + _describeList.call(this, item);
+    return item.description + ' ' + _listContents.call(this, item);
   }
   
   
   /*
    * Game action against some item.
    */
-  _events.actionItem = function (item, verb) {
+  _events.action = function (item, verb) {
     return 'You '+verb+' the '+item.name+' but nothing happens.';
+  }
+  
+  
+  /*
+   * Output simulation message.
+   */
+  _events.report = function (message) {
+    console.log (message);
   }
   
   
@@ -472,23 +477,24 @@ lantern = (function(){
     if (translation.item == null) {
       // Put the room into words
       var description = _events.getDescription.call(this, boiledRoom);
-      _events.reportDescription(boiledRoom, description);
+      _events.report(description);
     }
     else {
       if (item == null) {
         // the item is not visible
         var description = _events.getDefaultResponse.call(this, item, 'no such thing');
-        _events.reportDescription(boiledRoom, description);
+        _events.report(description);
       }
       else {
         if (translation.verb == 'examine') {
           // Examine the item in question
           var description = _events.getDescription.call(this, item);
-          _events.reportDescription(item, description);
+          _events.report(description);
         }
         else {
           // Perform some other perfunctionary action
-          _events.actionItem(item, translation.verb);
+          var result = _events.action(item, translation.verb);
+          _events.report(result);
         }
       }
     }
@@ -531,12 +537,13 @@ lantern = (function(){
 		turn: _turn,
     loadWorld: _loadWorld,
     data: null,
-    events: _events
+    events: _events,
+    listContents: _listContents
   }
   
   // Add debugging functions to the lantern object if LANTERN_DEBUG is truthy.
   if (typeof LANTERN_DEBUG !== 'undefined' && LANTERN_DEBUG == true) {
-    obj.describeList = _describeList;
+    obj.listContents = _listContents;
     obj.findByName = _findByName;
     obj.whichRoom = _whichRoom;
     obj.parse = _parse;
