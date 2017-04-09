@@ -78,7 +78,7 @@ function test_closed_unlocked_container_items() {
   drawer.locked = false;
   var described = lantern.listContents(drawer);
   logresult(described);
-  var expected = 'Inside it is a usb drive.';
+  var expected = 'You open it. Inside it is a usb drive.';
   if (described == expected)
     logsuccess();
   else

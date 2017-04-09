@@ -36,10 +36,10 @@ lantern = (function(){
     vowels: ['a', 'e', 'i', 'o', 'u'],
     responses: {
       'locked': 'It is locked.',
-      'not openable': 'That is not openable',
-      'opened': 'You open it',
+      'not openable': 'That is not openable.',
+      'opened': 'You open it.',
       'already open': 'It is already open.',
-      'no such thing': 'You don\'t see any such thing'
+      'no such thing': 'You don\'t see any such thing.'
       }
 	};
   
@@ -338,12 +338,13 @@ lantern = (function(){
   function _listContents (parent) {
     var that = this;
     var mentions = [];
+    var actionResult = '';
     
     // can't look in closed containers
     if (parent.type == 'container' && parent.open == false) {
       // try opening the container. This only happens when looking in the container directly, not if it is a child.
-      var result = _openContainer.call(this, parent);
-      if (parent.open == false) return result;
+      actionResult = _openContainer.call(this, parent);
+      if (parent.open == false) return actionResult;
     }
     
     parent.children.forEach(function (listItem) {
@@ -378,7 +379,7 @@ lantern = (function(){
       var lead = 'You see ';
       if (parent.type == 'supporter') lead = 'On it is ';
       if (parent.type == 'container') lead = 'Inside it is ';
-      return lead + _joinNames(mentions) + '.';
+      return (actionResult + ' ' + lead + _joinNames(mentions) + '.').trim();
     }
   }
   
