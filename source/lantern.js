@@ -443,8 +443,9 @@ lantern = (function(){
   /*
    * Game action against some item.
    */
-  _events.action = function (item, verb) {
-    return 'You '+verb+' the '+item.name+' but nothing happens.';
+  _events.action = function (translation, room, item) {
+    // TODO call user defined function on the item
+    return 'You '+translation.verb+' the '+item.name+' but nothing happens.';
   }
   
   
@@ -473,31 +474,35 @@ lantern = (function(){
     var boiledRoom = _boilItem.call(this, _currentRoom.call(this));
     // match the item by name
     var item = _findInScope.call(this, translation.item, boiledRoom);
-    // an empty translation item defaults to the current location
-    if (translation.item == null) {
+    // A simple look around
+    if (translation.item == null && translation.verb == 'examine') {
       // Put the room into words
       var description = _events.getDescription.call(this, boiledRoom);
       _events.report(description);
     }
-    else {
-      if (item == null) {
-        // the item is not visible
-        var description = _events.getDefaultResponse.call(this, item, 'no such thing');
-        _events.report(description);
-      }
-      else {
-        if (translation.verb == 'examine') {
-          // Examine the item in question
-          var description = _events.getDescription.call(this, item);
-          _events.report(description);
-        }
-        else {
-          // Perform some other perfunctionary action
-          var result = _events.action(item, translation.verb);
-          _events.report(result);
-        }
-      }
+    // The mentioned noun is not visible
+    else if (translation.item != null && item == null) {
+      var description = _events.getDefaultResponse.call(this, item, 'no such thing');
+      _events.report(description);
     }
+    // Examine the item in question
+    else if (item != null && translation.verb == 'examine') {
+      var description = _events.getDescription.call(this, item);
+      _events.report(description);
+    }
+    // TODO check for empty item and going a direction
+    else if (translation.item == null && translation.dir != null) {
+      // TODO
+      _events.report( 'You go ' + translation.dir );
+    }
+    // TODO open things
+    // TODO close things
+    // No default action was performed, forward the action on
+    else {
+      var result = _events.action(translation, boiledRoom, item);
+      _events.report(result);
+    }
+    
 		return {
       translation:translation,
       room:boiledRoom,

@@ -62,7 +62,7 @@ run_test('give sword to gargoyle', [],
   
 run_test('look at gate', [], 
   {
-    verb:'look', 
+    verb:'examine', 
     item:'gate',
   });
   
@@ -173,7 +173,7 @@ run_test('go northwest', [],
 
 run_test('look e', [], 
   {
-    verb: 'look', 
+    verb: 'examine', 
     item: null, 
     nouns:null,
     dir:'e'
@@ -189,7 +189,7 @@ run_test('unlock security gate with bronze key', ['security gate', 'bronze key']
 
 run_test('look in mirror', [], 
   {
-    verb: 'look', 
+    verb: 'examine', 
     item: 'mirror', 
     nouns:null,
     dir:'in'
