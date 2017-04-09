@@ -496,7 +496,11 @@ lantern = (function(){
       // TODO
       _events.report( 'You go ' + translation.dir );
     }
-    // TODO open things
+    // open things
+    else if (translation.item && translation.verb == 'open') {
+      var result = _openContainer.call(this, translation.item);
+      _events.report(result);
+    }
     // TODO close things
     // No default action was performed, forward the action on
     else {
