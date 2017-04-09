@@ -36,9 +36,11 @@ lantern = (function(){
     vowels: ['a', 'e', 'i', 'o', 'u'],
     responses: {
       'locked': 'It is locked.',
-      'not openable': 'That is not openable.',
+      'not openable': 'That is not something you can open or close.',
       'opened': 'You open it.',
+      'closed': 'You closed it.',
       'already open': 'It is already open.',
+      'already closed': 'It is already closed.',
       'no such thing': 'You don\'t see any such thing.'
       }
 	};
@@ -501,7 +503,11 @@ lantern = (function(){
       var result = _openContainer.call(this, translation.item);
       _events.report(result);
     }
-    // TODO close things
+    // close things
+    else if (translation.item && translation.verb == 'close') {
+      var result = _closeContainer.call(this, translation.item);
+      _events.report(result);
+    }
     // No default action was performed, forward the action on
     else {
       var result = _events.action(translation, boiledRoom, item);
@@ -534,6 +540,29 @@ lantern = (function(){
     else {
       obj.open = true;
       result = _events.getDefaultResponse.call(this, item, 'opened');
+    }
+    return result;
+  }
+  
+	
+  /*
+   * Try close a container.
+   */
+  function _closeContainer (item) {
+    var obj = _toObject.call(this, item);
+    var result = 'Nothing happens.';
+    if (obj.type != 'container') {
+      result = _events.getDefaultResponse.call(this, item, 'not openable');
+    }
+    else if (obj.open == false) {
+      result = _events.getDefaultResponse.call(this, item, 'already closed');
+    }
+    else if (obj.locked) {
+      result = _events.getDefaultResponse.call(this, item, 'locked');
+    }
+    else {
+      obj.open = false;
+      result = _events.getDefaultResponse.call(this, item, 'closed');
     }
     return result;
   }
